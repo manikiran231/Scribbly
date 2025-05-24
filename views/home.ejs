@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="icon" type="image/png" href="/logo.png">
+    <%- include('./partials/head') %>
+    <title>Scribbly – Your voice, your space.</title>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            padding-top: 2rem;
+            padding-bottom: 3rem;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        header h1 {
+            font-weight: 700;
+            color: #343a40;
+        }
+        header p {
+            font-size: 1.2rem;
+            color: #6c757d;
+        }
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+            z-index: 10;
+        }
+        .card-img-top {
+            height: 180px;
+            object-fit: cover;
+            border-top-left-radius: 0.25rem;
+            border-top-right-radius: 0.25rem;
+        }
+        .card-body {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .card-title {
+            font-size: 1.25rem;
+            color: #212529;
+            margin-bottom: 1rem;
+        }
+        .btn-primary {
+            align-self: flex-start;
+        }
+        .row-cols-1,
+        .row-cols-sm-2,
+        .row-cols-md-3 {
+            row-gap: 2rem;
+        }
+        footer {
+            text-align: center;
+            padding: 0.3rem 0;
+            background-color: #343a40;
+            color: #fff;
+            margin-top: 3rem;
+            padding-top: 1rem;
+        }
+        footer a{
+            color: #2df1e1;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <%- include('./partials/nav') %>
+    <div class="container">
+        <header>
+            <h1>Welcome to Scribbly</h1>
+            <p>Your voice, your space.</p>
+        </header>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3">
+            <% blogs.forEach(blog => { %>
+                <div class="col d-flex">
+                    <div class="card w-100" tabindex="0" role="article" aria-label="Blog post titled <%= blog.title %>">
+                        <img src="<%= blog.coverImageURL %>" class="card-img-top" alt="Cover image for <%= blog.title %>">
+                        <div class="card-body">
+                            <h5 class="card-title"><%= blog.title %></h5>
+                            <a href="/blog/<%= blog._id %>" class="btn btn-primary" role="button" aria-pressed="false">Read 📚</a>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+    <footer>
+        <p>&copy; 2025 Scribbly. Made with ❤️ by <a href="https://www.linkedin.com/in/tamminaina-manikiran-85b03726a/">Manikiran</a>.</p>
+    </footer>
+    
+    <%- include('./partials/script') %>
+
+    <script>
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('keypress', e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    const link = card.querySelector('a.btn-primary');
+                    if (link) {
+                        link.click();
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
