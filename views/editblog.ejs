@@ -4,13 +4,53 @@
     <link rel="icon" type="image/png" href="/logo.png">
     <%- include('./partials/head') %>
     <title>Edit Blog</title>
+
     <style>
-      #imagePreview {
-        max-height: 200px;
-        object-fit: cover;
-        margin-top: 10px;
-        display: none;
-        border-radius: 10px;
+      :root {
+        --primary-color: #212529;
+        --bg-color: #f8f9fa;
+        --text-color: #212529;
+        --muted-color: #6c757d;
+        --card-bg: #ffffff;
+        --btn-success-bg: #198754;
+        --btn-success-bg-hover: #157347;
+      }
+
+      body {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body.dark-theme {
+        --primary-color: #e0e0e0;
+        --bg-color: #121212;
+        --text-color: #e0e0e0;
+        --muted-color: #aaaaaa;
+        --card-bg: #1e1e1e;
+        --btn-success-bg: #198754;
+        --btn-success-bg-hover: #157347;
+      }
+
+      h1 {
+        color: var(--primary-color);
+      }
+
+      label,
+      .form-text,
+      .btn {
+        color: var(--text-color);
+      }
+
+      .form-control {
+        background-color: #fff;
+        color: var(--text-color);
+      }
+
+      body.dark-theme .form-control {
+        background-color: #2a2a2a;
+        color: var(--text-color);
+        border-color: #444;
       }
 
       .form-control:invalid {
@@ -20,17 +60,72 @@
       .form-control:valid {
         border-color: #198754;
       }
+
+      body.dark-theme .form-control:invalid {
+        border-color: #e57373;
+      }
+
+      body.dark-theme .form-control:valid {
+        border-color: #4caf50;
+      }
+
+      button.btn-success {
+        background-color: var(--btn-success-bg);
+        border-color: var(--btn-success-bg);
+        color: #fff;
+      }
+
+      button.btn-success:hover {
+        background-color: var(--btn-success-bg-hover);
+        border-color: var(--btn-success-bg-hover);
+      }
+
+      #imagePreview {
+        max-height: 200px;
+        object-fit: cover;
+        margin-top: 10px;
+        display: none;
+        border-radius: 10px;
+      }
+
+      body.dark-theme #imagePreview {
+        border: 1px solid #444;
+      }
+
+      /* Theme toggle button */
+      .theme-toggle {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 0.25rem;
+        background-color: var(--primary-color);
+        color: var(--bg-color);
+        cursor: pointer;
+        z-index: 999;
+        font-weight: 600;
+        user-select: none;
+      }
     </style>
   </head>
   <body>
+    <!-- Theme toggle button -->
+    <button class="theme-toggle" id="themeToggleBtn">Toggle Theme</button>
+
     <%- include('./partials/nav') %>
 
     <div class="container p-4">
       <h1 class="text-center mb-4">✏️ Edit Blog</h1>
 
-      <form action="/dashboard/edit/<%= blog._id %>" method="POST" enctype="multipart/form-data" novalidate>
+      <form
+        action="/dashboard/edit/<%= blog._id %>"
+        method="POST"
+        enctype="multipart/form-data"
+        novalidate
+      >
         <!-- Cover Image -->
-          <div class="mb-3">
+        <div class="mb-3">
           <label for="coverImageURL" class="form-label">Cover Image</label>
           <input
             type="file"
@@ -40,16 +135,17 @@
             accept="image/*"
           />
           <% if (blog.coverImageURL) { %>
-            <img
-              id="imagePreview"
-              src="<%= blog.coverImageURL %>"
-              alt="Current Cover Image"
-              style="display: block;"
-            />
+          <img
+            id="imagePreview"
+            src="<%= blog.coverImageURL %>"
+            alt="Current Cover Image"
+            style="display: block"
+          />
           <% } else { %>
-            <img id="imagePreview" alt="Image Preview" />
+          <img id="imagePreview" alt="Image Preview" />
           <% } %>
         </div>
+
         <!-- Blog Title -->
         <div class="mb-3">
           <label for="title" class="form-label">Title</label>
@@ -79,9 +175,7 @@
 
         <!-- Submit Button -->
         <div class="text-center">
-          <button type="submit" class="btn btn-success btn-lg">
-            💾 Save Changes
-          </button>
+          <button type="submit" class="btn btn-success btn-lg">💾 Save Changes</button>
         </div>
       </form>
     </div>
@@ -89,6 +183,29 @@
     <%- include('./partials/script') %>
 
     <script>
+      // Theme toggle logic with localStorage
+      (function () {
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const body = document.body;
+
+        let currentTheme = localStorage.getItem('theme') || 'light';
+        applyTheme(currentTheme);
+
+        themeToggleBtn.addEventListener('click', () => {
+          currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+          applyTheme(currentTheme);
+          localStorage.setItem('theme', currentTheme);
+        });
+
+        function applyTheme(theme) {
+          if (theme === 'dark') {
+            body.classList.add('dark-theme');
+          } else {
+            body.classList.remove('dark-theme');
+          }
+        }
+      })();
+
       // Word count and auto-resize textarea
       const textarea = document.getElementById('content');
       const wordCountDisplay = document.getElementById('wordCount');
@@ -110,14 +227,14 @@
       textarea.style.height = textarea.scrollHeight + 'px';
 
       // Image preview live update
-      const coverImageInput = document.getElementById('coverImage');
+      const coverImageInput = document.getElementById('coverImageURL');
       const imagePreview = document.getElementById('imagePreview');
 
       coverImageInput.addEventListener('change', () => {
         const file = coverImageInput.files[0];
         if (file) {
           const reader = new FileReader();
-          reader.onload = e => {
+          reader.onload = (e) => {
             imagePreview.src = e.target.result;
             imagePreview.style.display = 'block';
           };

@@ -1,6 +1,6 @@
 const JWT=require("jsonwebtoken")
-
-const secret="theUnavailable"
+require("dotenv").config()
+const secret=process.env.SECRET
 
 const createUserToken=(user)=>{
     const payload={

@@ -79,6 +79,55 @@
         textarea.form-control {
             resize: vertical;
         }
+
+        /* Dark mode styles */
+        body.dark-theme {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+
+        body.dark-theme h1 {
+            color: #e0e0e0;
+        }
+
+        body.dark-theme .blog-body {
+            color: #e0e0e0;
+        }
+
+        body.dark-theme .author-box {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+        }
+
+        body.dark-theme .comment-box {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+        }
+
+        body.dark-theme .comment-box:hover {
+            background-color: #333;
+        }
+
+        body.dark-theme textarea.form-control {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+            border-color: #333;
+        }
+
+        body.dark-theme textarea.form-control:focus {
+            border-color: #198754;
+            box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+        }
+
+        body.dark-theme .btn-primary {
+            background-color: #198754;
+            border-color: #198754;
+        }
+
+        body.dark-theme .btn-primary:hover {
+            background-color: #157347;
+            border-color: #157347;
+        }
     </style>
 </head>
 
@@ -120,7 +169,7 @@
         <div class="mt-4">
             <% comments.forEach(comment => { %>
                 <div class="comment-box d-flex">
-                    <img src="<%= comment.createdBy.profileImgURL %>"  alt="User image">
+                    <img src="<%= comment.createdBy.profileImgURL %>" alt="User  image">
                     <div>
                         <strong><%= comment.createdBy.fullname %></strong>
                         <div class="comment-content"><%= comment.content %></div>
@@ -131,6 +180,32 @@
     </div>
 
     <%- include('./partials/script') %>
+
+    <script>
+        // Theme toggle logic
+        (function () {
+            const themeToggleBtn = document.getElementById('themeToggleBtn');
+            const body = document.body;
+
+            // Initialize theme from localStorage or default to light
+            let currentTheme = localStorage.getItem('theme') || 'light';
+            applyTheme(currentTheme);
+
+            themeToggleBtn.addEventListener('click', () => {
+                currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+                applyTheme(currentTheme);
+                localStorage.setItem('theme', currentTheme);
+            });
+
+            function applyTheme(theme) {
+                if (theme === 'dark') {
+                    body.classList.add('dark-theme');
+                } else {
+                    body.classList.remove('dark-theme');
+                }
+            }
+        })();
+    </script>
 </body>
 
 </html>

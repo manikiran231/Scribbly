@@ -7,15 +7,36 @@
     <link rel="icon" type="image/png" href="/logo.png">
     <title>Signin – Scribbly</title>
     <style>
+        :root {
+            --bg-gradient-start: #f8f9fa;
+            --bg-gradient-end: #e9ecef;
+            --card-bg: #ffffff;
+            --text-color: #343a40;
+            --form-icon-color: #007bff;
+            --btn-bg: #007bff;
+            --btn-color: #ffffff;
+        }
+
+        body.dark-theme {
+            --bg-gradient-start: #1a1a1a;
+            --bg-gradient-end: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --form-icon-color: #2db3f1;
+            --btn-bg: #2db3f1;
+            --btn-color: #000;
+        }
+
         body {
-            background: linear-gradient(to right, #f8f9fa, #e9ecef);
+            background: linear-gradient(to right, var(--bg-gradient-start), var(--bg-gradient-end));
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
         }
 
         .signin-card {
             max-width: 500px;
             margin: 5% auto;
-            background: #fff;
+            background: var(--card-bg);
             padding: 2rem;
             border-radius: 12px;
             box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1);
@@ -25,36 +46,57 @@
             font-weight: 600;
             margin-bottom: 2rem;
             text-align: center;
-            color: #343a40;
+            color: var(--text-color);
         }
 
         .form-label {
             font-weight: 500;
+            color: var(--text-color);
         }
 
         .btn-primary {
             width: 100%;
+            background-color: var(--btn-bg);
+            color: var(--btn-color);
+            border: none;
         }
 
         .form-control:focus {
-            border-color: #007bff;
+            border-color: var(--btn-bg);
             box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
         }
 
         .text-muted {
             text-align: center;
             margin-top: 1rem;
+            color: var(--text-color);
         }
 
         .form-icon {
             margin-right: 0.5rem;
-            color: #007bff;
+            color: var(--form-icon-color);
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.25rem;
+            background-color: var(--btn-bg);
+            color: var(--btn-color);
+            cursor: pointer;
+            z-index: 999;
         }
     </style>
 </head>
 
 <body>
     <%- include('./partials/nav') %>
+
+    <!-- Theme toggle button -->
+    <button class="theme-toggle" id="themeToggleBtn">Toggle Theme</button>
 
     <div class="container">
         <div class="signin-card">
@@ -64,8 +106,7 @@
                     <label for="email" class="form-label">
                         <i class="form-icon bi bi-envelope-fill"></i>Email address
                     </label>
-                    <input type="email" name="email" class="form-control" id="email" required
-                        placeholder="Enter your email">
+                    <input type="email" name="email" class="form-control" id="email" required placeholder="Enter your email">
                     <div class="invalid-feedback">
                         Please enter a valid email.
                     </div>
@@ -74,8 +115,7 @@
                     <label for="password" class="form-label">
                         <i class="form-icon bi bi-lock-fill"></i>Password
                     </label>
-                    <input type="password" name="password" class="form-control" id="password" required
-                        placeholder="Enter your password">
+                    <input type="password" name="password" class="form-control" id="password" required placeholder="Enter your password">
                     <div class="invalid-feedback">
                         Password is required.
                     </div>
@@ -88,15 +128,36 @@
 
     <%- include('./partials/script') %>
 
-    <!-- Enable Bootstrap 5 icons if not already included -->
+    <!-- Optional: Bootstrap Icons CDN if needed -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.js"></script>
 
-    <!-- Optional: Client-side validation script -->
+    <!-- Theme toggle + validation script -->
     <script>
-        // Bootstrap client-side validation
+        (function () {
+            const themeToggleBtn = document.getElementById('themeToggleBtn');
+            const body = document.body;
+            let currentTheme = localStorage.getItem('theme') || 'light';
+            applyTheme(currentTheme);
+
+            themeToggleBtn.addEventListener('click', () => {
+                currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+                applyTheme(currentTheme);
+                localStorage.setItem('theme', currentTheme);
+            });
+
+            function applyTheme(theme) {
+                if (theme === 'dark') {
+                    body.classList.add('dark-theme');
+                } else {
+                    body.classList.remove('dark-theme');
+                }
+            }
+        })();
+
+        // Client-side form validation
         (function () {
             const forms = document.querySelectorAll('form');
-            Array.from(forms).forEach(function (form) {
+            Array.from(forms).forEach(form => {
                 form.addEventListener('submit', function (event) {
                     if (!form.checkValidity()) {
                         event.preventDefault();

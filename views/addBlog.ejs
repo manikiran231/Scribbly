@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="/logo.png">
 
@@ -10,87 +10,133 @@
     <title>Add New Blog - Scribbly</title>
 
     <style>
-      #imagePreview {
-        max-height: 200px;
-        object-fit: cover;
-        margin-top: 10px;
-        display: none;
-        border-radius: 10px;
-      }
-      .form-control:invalid {
-        border-color: #dc3545;
-      }
-      .form-control:valid {
-        border-color: #198754;
-      }
+        #imagePreview {
+            max-height: 200px;
+            object-fit: cover;
+            margin-top: 10px;
+            display: none;
+            border-radius: 10px;
+        }
+        .form-control:invalid {
+            border-color: #dc3545;
+        }
+        .form-control:valid {
+            border-color: #198754;
+        }
+        /* Dark mode styles */
+        body.dark-theme {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        body.dark-theme .form-control {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+            border-color: #333;
+        }
+        body.dark-theme .form-control:focus {
+            border-color: #198754;
+            box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+        }
+        body.dark-theme .btn-primary {
+            background-color: #198754;
+            border-color: #198754;
+        }
+        body.dark-theme .btn-primary:hover {
+            background-color: #157347;
+            border-color: #157347;
+        }
     </style>
-  </head>
-  <body>
+</head>
+<body>
     <!-- Navigation -->
     <%- include('./partials/nav') %>
 
     <!-- Blog Form -->
     <div class="container p-4">
-      <h1 class="text-center mb-4">📝 Add New Blog</h1>
-      <form action="/blog" method="POST" enctype="multipart/form-data" novalidate>
-        <!-- Cover Image Upload -->
-        <div class="mb-3">
-          <label class="form-label">Cover Image</label>
-          <input type="file" name="coverImage" class="form-control" id="coverImage" accept="image/*">
-          <img id="imagePreview" class="img-fluid shadow-sm" />
-        </div>
+        <h1 class="text-center mb-4">📝 Add New Blog</h1>
+        <form action="/blog" method="POST" enctype="multipart/form-data" novalidate>
+            <!-- Cover Image Upload -->
+            <div class="mb-3">
+                <label class="form-label">Cover Image</label>
+                <input type="file" name="coverImage" class="form-control" id="coverImage" accept="image/*">
+                <img id="imagePreview" class="img-fluid shadow-sm" />
+            </div>
 
-        <!-- Blog Title -->
-        <div class="mb-3">
-          <label class="form-label">Title</label>
-          <input type="text" name="title" class="form-control" id="title" required maxlength="150"
-            placeholder="Enter a catchy title..." />
-        </div>
+            <!-- Blog Title -->
+            <div class="mb-3">
+                <label class="form-label">Title</label>
+                <input type="text" name="title" class="form-control" id="title" required maxlength="150"
+                    placeholder="Enter a catchy title..." />
+            </div>
 
-        <!-- Blog Content -->
-        <div class="mb-3">
-          <label class="form-label">Content</label>
-          <textarea name="body" class="form-control" id="body" rows="6" required
-            placeholder="Write your story here..."></textarea>
-          <div class="form-text"><span id="wordCount">0</span> words</div>
-        </div>
+            <!-- Blog Content -->
+            <div class="mb-3">
+                <label class="form-label">Content</label>
+                <textarea name="body" class="form-control" id="body" rows="6" required
+                    placeholder="Write your story here..."></textarea>
+                <div class="form-text"><span id="wordCount">0</span> words</div>
+            </div>
 
-        <!-- Submit Button -->
-        <div class="text-center">
-          <button type="submit" class="btn btn-primary btn-lg">🚀 Publish Blog</button>
-        </div>
-      </form>
+            <!-- Submit Button -->
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary btn-lg">🚀 Publish Blog</button>
+            </div>
+        </form>
     </div>
 
     <!-- Scripts -->
     <%- include('./partials/script') %>
 
     <script>
-      // Live preview for image
-      const imageInput = document.getElementById('coverImage');
-      const imagePreview = document.getElementById('imagePreview');
-      imageInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
-          imagePreview.src = URL.createObjectURL(file);
-          imagePreview.style.display = 'block';
+        // Theme toggle logic
+        (function () {
+            const themeToggleBtn = document.getElementById('themeToggleBtn');
+            const body = document.body;
+
+            // Initialize theme from localStorage or default to light
+            let currentTheme = localStorage.getItem('theme') || 'light';
+            applyTheme(currentTheme);
+
+            themeToggleBtn.addEventListener('click', () => {
+                currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+                applyTheme(currentTheme);
+                localStorage.setItem('theme', currentTheme);
+            });
+
+            function applyTheme(theme) {
+                if (theme === 'dark') {
+                    body.classList.add('dark-theme');
+                } else {
+                    body.classList.remove('dark-theme');
+                }
+            }
+        })();
+
+        // Live preview for image
+        const imageInput = document.getElementById('coverImage');
+        const imagePreview = document.getElementById('imagePreview');
+        imageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                imagePreview.src = URL.createObjectURL(file);
+                imagePreview.style.display = 'block';
+            }
+        });
+
+        // Auto resize textarea
+        const textarea = document.getElementById('body');
+        textarea.addEventListener('input', () => {
+            textarea.style.height = 'auto';
+            textarea.style.height = textarea.scrollHeight + 'px';
+            updateWordCount();
+        });
+
+        // Word count
+        function updateWordCount() {
+            const text = textarea.value.trim();
+            const words = text.length ? text.split(/\s+/).length : 0;
+            document.getElementById('wordCount').innerText = words;
         }
-      });
-
-      // Auto resize textarea
-      const textarea = document.getElementById('body');
-      textarea.addEventListener('input', () => {
-        textarea.style.height = 'auto';
-        textarea.style.height = textarea.scrollHeight + 'px';
-        updateWordCount();
-      });
-
-      // Word count
-      function updateWordCount() {
-        const text = textarea.value.trim();
-        const words = text.length ? text.split(/\s+/).length : 0;
-        document.getElementById('wordCount').innerText = words;
-      }
     </script>
-  </body>
+</body>
 </html>
